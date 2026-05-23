@@ -1,3 +1,13 @@
+---
+title: TeraStreamBot
+emoji: 🤖
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
 # TeraStreamBot
 
 A high-performance, asynchronous Telegram bot to download and stream files/videos from **TeraBox** links. Designed to run seamlessly in low-memory containerized environments (like Koyeb or Render) and optimized for deployment on **Hugging Face Spaces** (Free 16GB RAM tier).
