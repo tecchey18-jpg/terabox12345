@@ -251,15 +251,7 @@ def build_app() -> Application:
     """
     logger.info("Initializing Telegram Bot application...")
     
-    # Set higher timeouts for network requests to Telegram API
-    app = (
-        Application.builder()
-        .token(BOT_TOKEN)
-        .connect_timeout(30)  # seconds
-        .read_timeout(120)    # seconds
-        .request_timeout(300)  # seconds overall request timeout
-        .build()
-    )
+    app = Application.builder().token(BOT_TOKEN).build()
     
     # Register command handlers
     app.add_handler(CommandHandler("start", start_command))
