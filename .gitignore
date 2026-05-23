@@ -1,0 +1,8 @@
+app/temp/
+logs/
+.env
+__pycache__/
+*.pyc
+.git/
+scratch/
+.system_generated/

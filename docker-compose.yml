@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  bot:
+    build: .
+    container_name: terastream_bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/home/user/app/logs
+      - ./app/temp:/home/user/app/app/temp
+    # Using host IPC to prevent Chrome memory crashes inside Docker
+    ipc: host

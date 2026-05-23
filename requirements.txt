@@ -1,0 +1,27 @@
+# TeraStreamBot Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Telegram Bot Framework
+python-telegram-bot>=21.6
+
+# Browser Automation
+playwright>=1.44.0
+
+# Playwright stealth mode
+playwright-stealth>=1.0.6
+
+# Async HTTP client for streaming downloads
+aiohttp>=3.10.0
+
+# Async file I/O
+aiofiles>=23.2.1
+
+# Environment variable loader
+python-dotenv>=1.0.1
+
+# Sync HTTP requests
+requests>=2.31.0
+
+# Typing support
+typing-extensions>=4.11.0
+
