@@ -1,6 +1,6 @@
 # Use the official Microsoft Playwright Python base image
 # This contains Python, Node, and all OS-level dependencies for Chromium pre-installed.
-FROM mcr.microsoft.com/playwright/python:v1.44.0-jammy
+FROM mcr.microsoft.com/playwright/python:v1.60.0-jammy
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
