@@ -16,22 +16,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Ensure the pre-installed browsers are readable/executable by the non-root user
 RUN chmod -R 777 /ms-playwright
 
-# Create a non-root user and set up working directory
-RUN useradd -m -u 1000 user
-WORKDIR /home/user/app
+# The base image already has a non-root user 'pwuser' (UID 1000) pre-created
+WORKDIR /home/pwuser/app
 
 # Copy requirements and install python packages
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
-COPY --chown=user:user . .
+COPY --chown=pwuser:pwuser . .
 
 # Change ownership of app directory
-RUN chown -R user:user /home/user/app
+RUN chown -R pwuser:pwuser /home/pwuser/app
 
 # Switch to the non-root user
-USER user
+USER pwuser
 
 # Create temp and logs directories and ensure they are writable
 RUN mkdir -p app/temp logs
