@@ -257,7 +257,7 @@ def build_app() -> Application:
         .token(BOT_TOKEN)
         .connect_timeout(30)  # seconds
         .read_timeout(120)    # seconds
-        .request_timeout(180)  # seconds overall request timeout
+        .request_timeout(300)  # seconds overall request timeout
         .build()
     
     # Register command handlers
