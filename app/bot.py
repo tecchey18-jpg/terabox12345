@@ -39,7 +39,7 @@ browser_semaphore = asyncio.Semaphore(MAX_CONCURRENT_BROWSERS)
 
 # Regular expression to match any Terabox-related domain name
 TERABOX_DOMAINS_RE = re.compile(
-    r'(terabox|nephobox|mirrobox|tibibox|momot|teraboxapp|freeterabox)\.[a-z]{2,}'
+    r'(1024terabox|terabox|nephobox|mirrobox|tibibox|momot|teraboxapp|freeterabox|4funbox|terafileshare|terasharelink|1024tera)\.[a-z]{2,}'
 )
 
 
