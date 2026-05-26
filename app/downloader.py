@@ -172,11 +172,28 @@ async def extract_via_playwright(url: str, timeout: int = 45) -> dict:
                 result["url"] = video_src
                 
             # If no direct link extracted, trigger click on Download button
-            if not result["url"] and not direct_urls:
-                download_btn = await page.query_selector(".download-btn, button:has-text('Download')")
-                if download_btn:
-                    await download_btn.click()
-                    await page.wait_for_timeout(5000)
+            # Attempt to click the download button using multiple possible selectors
+            download_btn = None
+            selectors = [
+                ".download-btn",
+                "button:has-text('Download')",
+                "a.download",
+                "button.download"
+            ]
+            for sel in selectors:
+                try:
+                    btn = await page.query_selector(sel)
+                    if btn:
+                        await btn.scroll_into_view_if_needed()
+                        # Use a larger timeout and force the click via JavaScript if needed
+                        await btn.click(timeout=60000)
+                        download_btn = btn
+                        logger.info(f"Clicked download button using selector '{sel}'")
+                        break
+                except Exception as e:
+                    logger.debug(f"Selector '{sel}' not usable: {e}")
+            if not download_btn:
+                logger.warning("Download button not found via known selectors – proceeding without explicit click.")
                     
             if not result["url"] and direct_urls:
                 result["url"] = direct_urls[0]
