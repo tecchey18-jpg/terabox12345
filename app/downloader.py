@@ -164,7 +164,10 @@ async def extract_via_playwright(url: str, timeout: int = 45) -> dict:
                             break
             
             # Check if a video tag src is already loaded
-            video_src = await page.eval_on_selector("video", "el => el.src", default=None)
+            try:
+                video_src = await page.eval_on_selector("video", "el => el.src")
+            except Exception:
+                video_src = None
             if video_src and video_src.startswith("http"):
                 result["url"] = video_src
                 
