@@ -35,5 +35,5 @@ USER pwuser
 # Create temp and logs directories and ensure they are writable
 RUN mkdir -p app/temp logs
 
-# Command to run the bot
-CMD ["python", "main.py"]
+# Command to run the bot and a dummy HTTP server
+CMD ["sh", "-c", "python app/web_server.py & python main.py"]
