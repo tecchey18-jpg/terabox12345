@@ -126,8 +126,11 @@ async def extract_via_playwright(url: str, timeout: int = 45) -> dict:
             nonlocal filename, filesize
             req_url = response.url
             
-            # Match known direct download / stream domains
+            # Capture direct download / stream domains
             if "pcs.baidu.com" in req_url or "d.pcs.baidu.com" in req_url or "terabox.com/file" in req_url:
+                direct_urls.append(req_url)
+            # Capture common video stream patterns (.m3u8, .mp4)
+            if any(ext in req_url for ext in (".m3u8", ".mp4")):
                 direct_urls.append(req_url)
                 
             # Intercept metadata request response
@@ -142,6 +145,9 @@ async def extract_via_playwright(url: str, timeout: int = 45) -> dict:
                             direct_urls.insert(0, file_item["dlink"])
                 except Exception:
                     pass
+            
+            # Log captured URLs for debugging
+            logger.debug(f"Captured response URL: {req_url}")
                     
         page.on("response", handle_response)
         
@@ -150,20 +156,9 @@ async def extract_via_playwright(url: str, timeout: int = 45) -> dict:
             await page.goto(url, wait_until="load", timeout=timeout * 1000)
             
             # Wait for content to render and trigger background requests
-            await page.wait_for_timeout(6000)
+            await page.wait_for_timeout(8000)
             
-            # Scrape file name from DOM if the network request didn't capture it
-            if not filename:
-                title_selectors = [".filename", ".file-name", "h1.file-title", "h1"]
-                for selector in title_selectors:
-                    title_el = await page.query_selector(selector)
-                    if title_el:
-                        val = await title_el.text_content()
-                        if val and val.strip():
-                            filename = val.strip()
-                            break
-            
-            # Check if a video tag src is already loaded
+            # Re‑check for video src after possible lazy‑load
             try:
                 video_src = await page.eval_on_selector("video", "el => el.src")
             except Exception:
@@ -173,28 +168,30 @@ async def extract_via_playwright(url: str, timeout: int = 45) -> dict:
                 
             # If no direct link extracted, trigger click on Download button
             # Attempt to click the download button using multiple possible selectors
-            download_btn = None
-            selectors = [
-                ".download-btn",
-                "button:has-text('Download')",
-                "a.download",
-                "button.download"
-            ]
-            for sel in selectors:
-                try:
-                    btn = await page.query_selector(sel)
-                    if btn:
-                        await btn.scroll_into_view_if_needed()
-                        # Use a larger timeout and force the click via JavaScript if needed
-                        await btn.click(timeout=60000)
-                        download_btn = btn
-                        logger.info(f"Clicked download button using selector '{sel}'")
-                        break
-                except Exception as e:
-                    logger.debug(f"Selector '{sel}' not usable: {e}")
-            if not download_btn:
-                logger.warning("Download button not found via known selectors – proceeding without explicit click.")
-                    
+            if not result["url"] and not direct_urls:
+                download_btn = None
+                selectors = [
+                    ".download-btn",
+                    "button:has-text('Download')",
+                    "a.download",
+                    "button.download"
+                ]
+                for sel in selectors:
+                    try:
+                        btn = await page.query_selector(sel)
+                        if btn:
+                            await btn.scroll_into_view_if_needed()
+                            # Use a larger timeout and force the click via JavaScript if needed
+                            await btn.click(timeout=60000)
+                            download_btn = btn
+                            logger.info(f"Clicked download button using selector '{sel}'")
+                            break
+                    except Exception as e:
+                        logger.debug(f"Selector '{sel}' not usable: {e}")
+                if not download_btn:
+                    logger.warning("Download button not found via known selectors – proceeding without explicit click.")
+            
+            # Final fallback: use any captured direct URLs
             if not result["url"] and direct_urls:
                 result["url"] = direct_urls[0]
                 
